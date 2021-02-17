@@ -81,7 +81,7 @@ resource "aws_security_group_rule" "ssh" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["76.104.40.126/32"]
+  cidr_blocks       = var.admin_whitelist
   security_group_id = aws_security_group.web.id
 }
 
@@ -112,20 +112,16 @@ resource "aws_instance" "test" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.micro"
   subnet_id                   = aws_subnet.public-1b.id
-  security_groups             = [ aws_security_group.web.id ]
-  key_name                    = "viggy-login"
+  vpc_security_group_ids      = [ aws_security_group.web.id ]
+  key_name                    = var.key_pair_name
 
   tags = {
     Name = "Fairwinds Assessment Host"
   }
-
-  user_data = <<-EOH
-
-  !#/bin/bash
-  apt-get update
-  apt-get install 
-
-  EOH
-
 }
 
+resource "null_resource" "ansible_configure" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i '${aws_eip.public_ip.public_ip},' configure.yaml -u ubuntu --private-key ${var.key_pair_path}"
+  }
+}

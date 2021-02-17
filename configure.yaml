@@ -15,7 +15,6 @@
       - curl
       - gnupg-agent
       - software-properties-common
-      - python3-pip
     become: true
 
   - name: Add docker GPG key
@@ -31,6 +30,7 @@
       - docker-ce
       - docker-ce-cli
       - containerd.io
+      - python3-pip
     become: true
   
   - name: Install docker-py
@@ -39,7 +39,7 @@
       name: docker-py
     become: true
       
-  - name: Create a data container
+  - name: Run django container
     docker_container:
       name: mydata
       image: viggynash/viggy-fw-assessment
