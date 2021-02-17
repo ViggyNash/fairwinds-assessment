@@ -118,5 +118,14 @@ resource "aws_instance" "test" {
   tags = {
     Name = "Fairwinds Assessment Host"
   }
+
+  user_data = <<-EOH
+
+  !#/bin/bash
+  apt-get update
+  apt-get install 
+
+  EOH
+
 }
 

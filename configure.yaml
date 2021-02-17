@@ -1,9 +1,50 @@
 ---
 
 - name: Configure host
-  hosts: {{ host_ip }}
-  remote_user: root
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
 
   tasks:
-  - 
+
+  - name: Install docker prerequisites
+    apt:
+      pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+      - python3-pip
+    become: true
+
+  - name: Add docker GPG key
+    shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+  - name: Add specified repository into sources list
+    shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    become: true
+
+  - name: Install docker
+    apt:
+      pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    become: true
+  
+  - name: Install docker-py
+    executable: /usr/bin/pip3
+    pip:
+      name: docker-py
+    become: true
+      
+  - name: Create a data container
+    docker_container:
+      name: mydata
+      image: viggynash/viggy-fw-assessment
+      ports:
+      - "80:8000"
+    become: true
+
 
