@@ -1,0 +1,9 @@
+---
+
+- name: Configure host
+  hosts: {{ host_ip }}
+  remote_user: root
+
+  tasks:
+  - 
+
